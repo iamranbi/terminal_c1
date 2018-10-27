@@ -55,15 +55,56 @@ class AlgoStrategy(gamelib.AlgoCore):
 
         #self.starter_strategy(game_state)
 
-        destructor_locations = [[ 2, 13],[ 22, 13],[ 25, 13],[ 26, 13],[ 3, 12],[ 10, 12],[ 17, 12]]
-        filter_locations = [[ 3, 13],[ 10, 13],[ 17, 13],[ 23, 13],[ 24, 13],[ 22, 12],[ 22, 11]]
-        encryptor_locations = [[ 23, 12],[ 24, 12],[ 23, 11],[ 24, 11]]
-        emp_location = [23, 9]
+        cur_cores = game_state.get_resource(game_state.CORES, 0)
+        cur_bits = game_state.get_resource(game_state.BITS, 0)
 
-        game_state.attempt_spawn(DESTRUCTOR, destructor_locations)
-        game_state.attempt_spawn(FILTER, filter_locations)
-        game_state.attempt_spawn(ENCRYPTOR, encryptor_locations)
-        game_state.attempt_spawn(EMP, emp_location)
+        destructor_locations = [[3,11], [5,11], [8,11], [12,11], [15,11], [19,11], [22,11], [24,11]]
+        for destruct_loc in destructor_locations:
+            if game_state.contains_stationary_unit(destruct_loc):
+                continue
+            if cur_cores < game_state.type_cost(DESTRUCTOR): # cannot afford another core
+                break
+            game_state.attempt_spawn(DESTRUCTOR, [destruct_loc])
+            cur_cores = game_state.get_resource(game_state.CORES, 0)
+
+        filter_locations = [[0,13], [27,13], [1,12], [26,12], [2,11],  [25,11], [4,11], [6,11], [7,11], [9,11], [10,11], [11,11], [13,11], [14,11], [16,11], [17,11], [18,11], [20,11], [21,11]]
+        for filter_loc in filter_locations:
+            if game_state.contains_stationary_unit(filter_loc):
+                continue
+            if cur_cores < game_state.type_cost(FILTER): # cannot afford another core
+                break
+            game_state.attempt_spawn(FILTER, [filter_loc])
+            cur_cores = game_state.get_resource(game_state.CORES, 0)
+
+        filter_secondary = [[19,9],[20,9],[21,9],[22,9],[23,9], [1,13],[26,13], [2,13],[25,13]]
+        for filter_loc in filter_secondary:
+            if game_state.contains_stationary_unit(filter_loc):
+                continue
+            if cur_cores < game_state.type_cost(FILTER): # cannot afford another core
+                break
+            game_state.attempt_spawn(FILTER, [filter_loc])
+            cur_cores = game_state.get_resource(game_state.CORES, 0)
+
+        destruct_secondary = [[2,12],[25,12]]
+        for destruct_loc in destruct_secondary:
+            if game_state.contains_stationary_unit(destruct_loc):
+                continue
+            if cur_cores < game_state.type_cost(DESTRUCTOR): # cannot afford another core
+                break
+            game_state.attempt_spawn(DESTRUCTOR, [destruct_loc])
+            cur_cores = game_state.get_resource(game_state.CORES, 0)
+
+        if (game_state.turn_number < 3 or game_state.turn_number % 2 == 0):
+            emp_locations = [3,10]
+            num_emp = cur_bits / game_state.type_cost(EMP)
+            num_emp = math.floor(num_emp)
+            game_state.attempt_spawn(EMP, emp_locations, num=num_emp)
+        if (game_state.turn_number >= 3 and game_state.turn_number % 2 != 0):
+            cur_bits = game_state.get_resource(game_state.BITS, 0)
+            ping_locations = [3,10]
+            num_ping = cur_bits / game_state.type_cost(PING)
+            num_ping = math.floor(num_ping)
+            game_state.attempt_spawn(PING, ping_locations, num=num_ping)
 
         game_state.submit_turn()
 
