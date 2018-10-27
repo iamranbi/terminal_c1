@@ -96,7 +96,7 @@ class AlgoStrategy(gamelib.AlgoCore):
         
         scrambler_location_1 = [24,10]
         scrambler_location_2 = [3,10]
-        emp_locations = [3,10]
+        emp_locations = [24,10]
         ping_locations = [3,10]
         num_scrambler = 1
         game_state.attempt_spawn(SCRAMBLER, scrambler_location_1, num=num_scrambler)
