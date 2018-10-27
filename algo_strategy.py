@@ -93,18 +93,23 @@ class AlgoStrategy(gamelib.AlgoCore):
                 break
             game_state.attempt_spawn(DESTRUCTOR, [destruct_loc])
             cur_cores = game_state.get_resource(game_state.CORES, 0)
-
-        if (game_state.turn_number < 3 or game_state.turn_number % 2 == 0):
-            emp_locations = [3,10]
-            num_emp = cur_bits / game_state.type_cost(EMP)
-            num_emp = math.floor(num_emp)
-            game_state.attempt_spawn(EMP, emp_locations, num=num_emp)
-        if (game_state.turn_number >= 3 and game_state.turn_number % 2 != 0):
+        
+        scrambler_location_1 = [24,10]
+        scrambler_location_2 = [3,10]
+        emp_locations = [3,10]
+        ping_locations = [3,10]
+        num_scrambler = 1
+        game_state.attempt_spawn(SCRAMBLER, scrambler_location_1, num=num_scrambler)
+      
+        if (game_state.turn_number == 0):
+            game_state.attempt_spawn(SCRAMBLER, scrambler_location_2, num=num_scrambler)
+            game_state.attempt_spawn(PING, emp_locations, num=3)
+        if (game_state.turn_number > 1):
+            game_state.attempt_spawn(EMP, emp_locations, num=1)
             cur_bits = game_state.get_resource(game_state.BITS, 0)
-            ping_locations = [3,10]
             num_ping = cur_bits / game_state.type_cost(PING)
             num_ping = math.floor(num_ping)
-            game_state.attempt_spawn(PING, ping_locations, num=num_ping)
+            game_state.attempt_spawn(PING, emp_locations, num=num_ping)
 
         game_state.submit_turn()
 
